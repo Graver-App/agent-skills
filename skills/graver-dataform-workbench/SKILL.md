@@ -95,6 +95,14 @@ Each refusal names the exact terminal command, so pass it on rather than paraphr
 A refusal is a correctness feature. Do not route around one by hand-writing the SQL
 and running it yourself.
 
+**There is no full-refresh switch.** How an incremental writes is decided by what is
+already in the warehouse, not by a flag you pass: no table yet builds it from the full
+query; a table with a unique key is merged, so re-running cannot duplicate rows; a table
+with no unique key is appended to, trusting the query's own `when(incremental())` filter.
+So "rebuild the incrementals from scratch" is **not expressible here** — that is
+`dataform run --actions <name> --full-refresh` in the terminal. Do not run an incremental
+through the tool while telling the user it was rebuilt.
+
 ## Staleness is a sampled answer
 
 `dataform_staleness` covers the files checked so far — the workbench checks what the

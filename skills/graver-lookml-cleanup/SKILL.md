@@ -93,6 +93,12 @@ not strip it when you summarise.
   fields are unchecked, not clean.
 - `warehouse.unvalidatableViews` — same: unchecked.
 
+If that identity caveat is load-bearing — you are about to delete something on the
+strength of "table not found" — the answer is to **re-run with credentials that can see
+what Looker's connection sees**, not to reason about it. A single-purpose, expiring
+service account for the audit is the usual way; `bigquery_project` then checks as that
+identity. Until then, "missing" means "not visible from here".
+
 **"No longer reported" is not "fixed".** The diff deliberately does not say *fixed*.
 A finding leaves the report when someone fixes it, when whatever exposed it is
 removed (retire an explore and its missing joins vanish while the view still
