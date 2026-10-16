@@ -50,7 +50,10 @@ Read `replay` first. It is always present:
 
 - `"replayed": false` — the warehouse answered directly. Nothing to qualify.
 - `replayed` true and `pinsAgree` true — the recording is of the tree the document
-  describes. Say which recording, and move on.
+  describes. Say which recording, and move on. Even then, check `unmatchedCalls`: a
+  LookML recording carries the Dataform cross-check's dry runs only if it was made
+  with `--dataform-project`, and without them every field needing one reaches no
+  verdict for a reason that has nothing to do with the project.
 - **`pinsAgree` false — do not publish a report that reads as current.** Put the
   `caveats` at the top of the page, before the findings, in the reader's path. They
   are whole sentences already; do not summarise them into "some caveats apply".
@@ -125,9 +128,32 @@ partition of the work.
 So: cluster on `file` (and `declaringView` for inherited fields), count the cluster,
 and only then say what the attributions in it mean. A cluster that is entirely
 `unattributed` and spread across one view usually resolves to a single upstream
-cause too — 72 fields reading *no column provenance for X* is one object to fix, not
-72 items. Report it that way, and the count becomes an argument for fixing it rather
+cause too — 72 fields reading *the dry run for X was refused* is one cause, not 72
+items. Report it that way, and the count becomes an argument for fixing it rather
 than a reason to skip the section.
+
+**Read `attributionReason` literally, and do not prescribe past it.** A missing
+verdict has several unrelated causes and they need opposite responses:
+
+| The reason says | What it means | What not to do |
+|---|---|---|
+| `the dry run for X was refused … HTTP 403` | the identity the check ran as cannot see something X reads | do not touch the LookML; re-run as an identity that can |
+| `the dry run for X was refused … notRecorded` | this was a replay and the recording never covered it | re-record with `--dataform-project`; the fields are unjudged, not clean |
+| `no warehouse was available` | the run had nothing to ask | the finding set is incomplete; say so |
+| `X is a derived table whose SQL doesn't pass a single table through` | provenance is not derivable from the shape | genuinely no verdict |
+| `not a missing-column error` | some other SQL problem | read the `message`; it may be the harness |
+
+In particular, **never advise adding a `columns:` block to resolve one.** Graver
+ignores a `columns:` block whenever the object's query is a pass-through
+`select *`, because the block is a subset by construction and trusting it would
+report working columns as stale. Those objects can only be judged by a dry run. A
+work order that says "document this object" there is wrong twice: the block usually
+already exists, and it would change nothing if it didn't.
+
+And an `unattributed` cluster is not evidence of absence *or* of innocence. Once the
+dry runs succeed, the fields get real verdicts — on the run this rule came from,
+89 fields across four views that had read as "no verdict" were every one a real
+stale reference, confirmed against `INFORMATION_SCHEMA` independently of the tool.
 
 ### Where the declared and the real diverge
 

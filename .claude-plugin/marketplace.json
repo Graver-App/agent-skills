@@ -9,7 +9,7 @@
     {
       "name": "graver-skills",
       "source": "./",
-      "version": "0.3.2",
+      "version": "0.3.3",
       "description": "Teaches a user's own agent Graver's MCP surface: the dataform_* loop, the LookML audit loop (validate, blast radius, fix what is charted, prove with a diff), per-view reconciliation against the warehouse including Liquid-templated SQL, and turning a findings document into a published report or an agent-executable checklist."
     }
   ]
