@@ -27,6 +27,9 @@ join away.
 > first, proving a cleanup with a diff — is `graver-lookml-cleanup`. Come here when
 > the question is about one view's columns.
 
+Asked instead to **write up or publish** what a run found, rather than to fix a view,
+use `graver-audit-report`.
+
 ## Start with the project-wide run, then distrust its coverage
 
 `looker_validate` (MCP) or `graver-lookml` (CLI) dry-runs each field's SQL against

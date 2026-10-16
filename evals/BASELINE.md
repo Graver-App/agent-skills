@@ -20,19 +20,30 @@ claude plugin eval . --runs 1 --no-publish --trust-plugin -j 2
 
 ## Triggering (`evals/run_triggers.py`)
 
-Recorded **2026-10-15**. 28 queries — 14 that must reach a skill, 14 that must not,
-including each skill's siblings' territory, because three overlapping Looker/Dataform
-skills can only go wrong by stealing each other's requests.
+Recorded **2026-10-16**, four skills. 40 queries — 23 that must reach a skill, 17 that
+must not, including each skill's siblings' territory, because four overlapping
+Looker/Dataform skills can only go wrong by stealing each other's requests.
 
 ```
-graver-looker-view-reconcile     9/9  correct  (FN 0, FP 0)
-graver-lookml-cleanup           11/11 correct  (FN 0, FP 0)
-graver-dataform-workbench        8/8  correct  (FN 0, FP 0)
+graver-audit-report              9/9  correct  (FN 0, FP 0)
+graver-looker-view-reconcile    10/10 correct  (FN 0, FP 0)
+graver-lookml-cleanup           12/12 correct  (FN 0, FP 0)
+graver-dataform-workbench        9/9  correct  (FN 0, FP 0)
 ```
 
-Every boundary holds: "remove the invalid columns from this one view" does not reach the
-project-wide skill, "audit our whole Looker project" does not reach the per-view one, and
-neither reaches the Dataform skill. Cost about **$2** and under two minutes at `-j 4`.
+Every boundary holds, in both directions. "Remove the invalid columns from this one view"
+does not reach the project-wide skill, "audit our whole Looker project" does not reach the
+per-view one, neither reaches the Dataform skill — and the two new boundaries hold too:
+"publish the Graver findings as a report" does not reach the cleanup skill, and
+`graver-audit-report` does not fire on a request to remove columns, run an audit, or run a
+Dataform object. Cost **$2.97** and 111s at `-j 6`.
+
+The report skill was the first one added after the set existed, and it passed on the first
+measurement with no description edits — which is the outcome the earlier
+`improve_description.py` experiment predicted would be rare and which is worth noting
+precisely because it was cheap to check.
+
+Previous run, 2026-10-15, three skills: 28 queries, 9/9 + 11/11 + 8/8, FN 0, FP 0, ~$2.
 
 ### Do not measure this with skill-creator's `run_eval.py`
 

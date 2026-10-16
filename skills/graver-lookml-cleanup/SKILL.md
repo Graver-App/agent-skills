@@ -29,6 +29,13 @@ Two surfaces, same engine:
   installed with the app, so if it is not on your PATH, use the MCP tool; the flags below
   are listed because the two surfaces take the same options under different names.
 
+## Reporting it, not fixing it
+
+Asked to **publish** what a run found — a report for someone else, a shareable page,
+a checklist of the exact problems to work on — use **`graver-audit-report`** instead.
+It reads the document a run already wrote and says nothing about how to edit LookML.
+Run the loop below first if no document exists yet.
+
 ## One view, not the project
 
 Asked about a single view — "which dimensions here are broken", "remove the invalid

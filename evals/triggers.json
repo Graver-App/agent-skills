@@ -1,5 +1,5 @@
 {
-  "comment": "Trigger set: does each skill's description reach the requests it was written for, and stay out of its siblings' territory? Run with run_triggers.py, which measures through the real plugin mechanism. Do NOT measure this with skill-creator's scripts/run_eval.py \u2014 see BASELINE.md.",
+  "comment": "Trigger set: does each skill's description reach the requests it was written for, and stay out of its siblings' territory? Run with run_triggers.py, which measures through the real plugin mechanism. Do NOT measure this with skill-creator's scripts/run_eval.py — see BASELINE.md.",
   "queries": [
     {
       "skill": "graver-looker-view-reconcile",
@@ -145,6 +145,61 @@
       "skill": "graver-dataform-workbench",
       "should_trigger": true,
       "query": "We just backfilled column descriptions - are any of our columns: blocks claiming columns the query doesn't produce?"
+    },
+    {
+      "skill": "graver-audit-report",
+      "should_trigger": true,
+      "query": "Publish the Graver findings as a report I can share with my team"
+    },
+    {
+      "skill": "graver-audit-report",
+      "should_trigger": true,
+      "query": "Turn this validation JSON into a checklist of the exact problems to work on"
+    },
+    {
+      "skill": "graver-audit-report",
+      "should_trigger": true,
+      "query": "I have a findings.json from graver-lookml. Make me a report out of it."
+    },
+    {
+      "skill": "graver-audit-report",
+      "should_trigger": true,
+      "query": "Give me a prioritised list of what to fix from this audit document"
+    },
+    {
+      "skill": "graver-audit-report",
+      "should_trigger": true,
+      "query": "Can you read the declaration sweep JSON and write up what it found?"
+    },
+    {
+      "skill": "graver-audit-report",
+      "should_trigger": true,
+      "query": "Make an artifact out of the LookML audit so the analysts can see it"
+    },
+    {
+      "skill": "graver-audit-report",
+      "should_trigger": false,
+      "query": "Remove all columns in this looker view that are invalid in the data source"
+    },
+    {
+      "skill": "graver-audit-report",
+      "should_trigger": false,
+      "query": "Run a full LookML audit on this project and fix what is broken"
+    },
+    {
+      "skill": "graver-audit-report",
+      "should_trigger": false,
+      "query": "Compile and run the vw_orders object in my Dataform project"
+    },
+    {
+      "skill": "graver-lookml-cleanup",
+      "should_trigger": false,
+      "query": "Publish the Graver findings as a report I can share with my team"
+    },
+    {
+      "skill": "graver-looker-view-reconcile",
+      "should_trigger": false,
+      "query": "Turn this validation JSON into a checklist of the exact problems to work on"
     }
   ]
 }

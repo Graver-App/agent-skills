@@ -1,7 +1,7 @@
 {
   "name": "graver-skills",
-  "version": "0.2.1",
-  "description": "Agent Skills for Graver (graver.dev), the agent-native macOS workbench for Looker and BigQuery/Dataform development: the dataform_* loop, the whole-project LookML audit loop, and reconciling one Looker view against its data source.",
+  "version": "0.3.0",
+  "description": "Agent Skills for Graver (graver.dev), the agent-native macOS workbench for Looker and BigQuery/Dataform development: the dataform_* loop, the whole-project LookML audit loop, reconciling one Looker view against its data source, and publishing a findings document as a report or a checklist.",
   "author": {
     "name": "Graver",
     "url": "https://graver.dev"
