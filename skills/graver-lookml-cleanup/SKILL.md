@@ -124,6 +124,38 @@ reported ninety-seven findings gone with nothing fixed at all.
 `fieldsChecked` drops, fields were removed rather than fixed. That may be what was
 asked for; it is not the same thing.
 
+## What a clean report does not prove
+
+Everything above checks whether LookML *resolves* — files parse, references point at
+fields that exist, field SQL is something the warehouse accepts. A dashboard can be
+broken in ways none of that touches. These four are worth knowing before you tell
+anyone a view is clean; all were verified on a production Looker instance, and in
+each case LookML validation passes.
+
+**Nothing here renders a dashboard.** Layout and tab configuration, text-tile markdown,
+and element filter *values* are accepted by every static check and fail only when a tile
+runs. A dashboard whose LookML validates can still error on open.
+
+**A column of the wrong type passes.** A `dimension_group` over a BigQuery DATETIME
+column needs `datatype: datetime` beside `convert_tz: no`. Without it Looker still
+treats the column as a TIMESTAMP and emits TIMESTAMP literals in the date filter, so
+every tile over that group fails at run time with `No matching signature for operator
+>= for argument types: DATETIME, TIMESTAMP`. The dimension's own SQL is valid, which is
+why it validates: the generated *filter* is what breaks, and no static check generates
+filters. Confirm a time column's real type before writing the group.
+
+**Filter syntax is type-specific and unchecked.** A not-null filter on a string
+dimension is `"-NULL"`; a `type: number` dimension rejects that and takes `"NULL"` /
+`"NOT NULL"`. Validation evaluates no filter value, so the wrong one ships.
+
+**And the inverse: a validator complaint is not always a defect.** Table calculations
+belong only in an element's `dynamic_fields`, never in its `fields:`. Name one in
+`fields:` and the validator reports an unknown field once per element — while the tiles
+run and render correctly. Read a warning before acting on it; "the validator says so"
+is not the same as "it is broken", in either direction.
+
+The honest summary of a clean run is "nothing here fails to resolve", not "this works".
+
 ## Proving a cleanup
 
 Keep the first run's JSON as the baseline, **outside the project** — a findings

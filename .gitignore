@@ -1,0 +1,3 @@
+# Eval runs: per-run transcripts, scores and HTML reports. The numbers worth
+# keeping go in evals/BASELINE.md by hand.
+evals/results/

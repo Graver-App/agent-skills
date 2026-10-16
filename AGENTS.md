@@ -30,6 +30,30 @@ release check the skills against it in the same pass:
 4. Keep the frontmatter `description` stable unless the trigger surface genuinely changed
    — it is what agents match on.
 
+## Test before merging (mandatory for a skill change)
+
+This repo is also a Claude Code plugin (`.claude-plugin/plugin.json`, name
+`graver-skills`), which is what lets the eval harness load the skills and run a
+no-plugin baseline arm beside them:
+
+```bash
+claude plugin eval . --runs 1 --no-publish --trust-plugin -j 2
+```
+
+Each case is `evals/<case>/prompt.md` plus `evals/<case>/graders/*.md`. Results land in
+`evals/results/` (gitignored); the numbers worth keeping go in `evals/BASELINE.md` by
+hand, with the date and the run count.
+
+**When you add a rule a skill must teach, add a case that fails without it** — and then
+check the Δ, because a case that scores the same on both arms measures nothing. Two of
+the first four did exactly that; `BASELINE.md` says which and why, and carries the
+grader-authoring traps worth reading before writing one (vacuous `not_contains`
+graders, JavaScript regex flags, column-0 frontmatter, and how a wrong `input_match`
+reads exactly like a skill that never fired).
+
+Evals cost money and need model access, so they are a local gate rather than CI. CI
+lints frontmatter only.
+
 ## Conventions
 
 - One directory per skill under `skills/`, each with a `SKILL.md` whose frontmatter `name`

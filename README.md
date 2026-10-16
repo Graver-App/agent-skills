@@ -25,6 +25,12 @@ other Agent-Skills-compatible tools it detects):
 npx skills add Graver-App/agent-skills
 ```
 
+In Claude Code, as a plugin (the same skills, plus the eval suite):
+
+```bash
+/plugin install graver-skills --marketplace Graver-App/agent-skills
+```
+
 Manual install for any spec-compliant agent: copy (or symlink) the `skills/<name>/`
 directories you want into your agent's skills directory — e.g. `~/.claude/skills/` for
 Claude Code.
