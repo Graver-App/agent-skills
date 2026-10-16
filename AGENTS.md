@@ -51,12 +51,26 @@ grader-authoring traps worth reading before writing one (vacuous `not_contains`
 graders, JavaScript regex flags, column-0 frontmatter, and how a wrong `input_match`
 reads exactly like a skill that never fired).
 
+**A description change needs the trigger gate as well**, since the behaviour cases all
+name the validator explicitly and would pass while a skill went unused in practice:
+
+```bash
+python3 evals/run_triggers.py          # ~$2, under two minutes; exits non-zero on any FN/FP
+```
+
+It reads `evals/triggers.json` and measures through the real plugin mechanism. Add a
+query there whenever you change a `description`, and add the sibling-stealing negative
+too — three overlapping skills fail by taking each other's requests.
+
 Anthropic's official `skill-creator` plugin
 (`/plugin install skill-creator@claude-plugins-official`) covers the authoring side of
 this loop and adds something this suite does not have: `scripts/improve_description.py`
 and `scripts/run_loop.py` optimise a skill's `description` for **triggering** accuracy,
 with a train/test split. Worth reaching for when a skill is not firing on the requests
-it was written for — `trigger-user-phrasing` detects that, but does not fix it.
+it was written for — but **measure with `run_triggers.py`, not with that plugin's
+`scripts/run_eval.py`**, which under-reports on current Claude Code for the reason
+BASELINE.md records. Fed real numbers, its optimizer writes a sensible negative-scope
+clause; fed its own, it would have had you rewrite three working descriptions.
 
 Evals cost money and need model access, so they are a local gate rather than CI. CI
 lints frontmatter only.

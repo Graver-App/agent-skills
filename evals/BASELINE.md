@@ -18,6 +18,48 @@ claude plugin eval . --runs 1 --no-publish --trust-plugin -j 2
 | `cleanup-gone-is-not-fixed` | 0.88 | 1.00 | −0.13 | 4 | **Not discriminating.** The unaided arm declines to call the findings fixed in every run. The negative Δ is the `states-the-weaker-claim` regex missing the skilled arm's phrasing, not a skill regression. Regression guard only. |
 | `cleanup-defer-not-delete` | 1.00 | 1.00 | 0.00 | 4 | **Not discriminating.** Baseline Claude reliably refuses to delete on "nothing reaches it" and names Looker-UI content as the blind spot unaided. The skill fires and agrees. Regression guard only. |
 
+## Triggering (`evals/run_triggers.py`)
+
+Recorded **2026-10-15**. 28 queries — 14 that must reach a skill, 14 that must not,
+including each skill's siblings' territory, because three overlapping Looker/Dataform
+skills can only go wrong by stealing each other's requests.
+
+```
+graver-looker-view-reconcile     9/9  correct  (FN 0, FP 0)
+graver-lookml-cleanup           11/11 correct  (FN 0, FP 0)
+graver-dataform-workbench        8/8  correct  (FN 0, FP 0)
+```
+
+Every boundary holds: "remove the invalid columns from this one view" does not reach the
+project-wide skill, "audit our whole Looker project" does not reach the per-view one, and
+neither reaches the Dataform skill. Cost about **$2** and under two minutes at `-j 4`.
+
+### Do not measure this with skill-creator's `run_eval.py`
+
+Anthropic's `skill-creator` plugin ships a trigger evaluator, and on this build it
+under-reports badly. It scored these same descriptions 5/9, 5/9 and 5/8, with **every**
+failure a false negative — four realistic phrasings per skill apparently never firing.
+
+That was the instrument. It approximates a skill by writing a **slash command** into
+`.claude/commands/`, on the premise (in its own docstring) that this makes the skill
+"appear in Claude's available_skills list". Commands and skills are separate mechanisms
+now: a command runs when a user types `/name`, not from its description. Controlled
+check on one phrasing it scored 0/2 — "Clean up the dead columns in my zip_code view" —
+run through the real plugin mechanism: **2/2, Δ +1.00**.
+
+So `run_triggers.py` generates real eval cases against a temporary copy of this plugin
+and reads the `Skill` tool calls, which is what actually happens in a session.
+
+### The optimizer had nothing to fix
+
+Fed the *real* 28-query results, `skill-creator`'s `improve_description.py` still
+proposed a rewrite of all three descriptions, each adding an explicit "Not for …" clause
+and 100–240 characters. A/B measured: all six newly-guarded negatives **already** fail to
+fire on the current text, and the proposals break no positive (14/14 still fire). Zero
+measured gain, so none were adopted. Worth re-running if a real false positive ever shows
+up — the optimizer writes a sane negative clause, there is just nothing here for it to
+close.
+
 ## What the first suite taught
 
 **Two of five cases measure nothing**, and both are `graver-lookml-cleanup` rules that
