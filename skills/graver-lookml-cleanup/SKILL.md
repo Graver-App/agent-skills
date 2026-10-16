@@ -29,6 +29,15 @@ Two surfaces, same engine:
   installed with the app, so if it is not on your PATH, use the MCP tool; the flags below
   are listed because the two surfaces take the same options under different names.
 
+## One view, not the project
+
+Asked about a single view — "which dimensions here are broken", "remove the invalid
+columns in this view" — use **`graver-looker-view-reconcile`** instead. A whole-project
+run names the fields it rejected but not the ones it skipped, and on one view the
+skipped ones are often the point: Liquid SQL and `${other_view.field}` expressions are
+never checked here, so "2 failing" on a 22-field view can mean a third was never looked
+at. That skill validates each field itself, branch by branch.
+
 ## Run it in this order
 
 ```

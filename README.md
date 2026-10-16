@@ -14,6 +14,7 @@ the data does **not** support.
 |---|---|
 | [`graver-dataform-workbench`](skills/graver-dataform-workbench/SKILL.md) | The `dataform_*` loop: orient with `dataform_status`, free dry-run validation that stays correct across un-run upstream changes, per-object runs, protected profiles, sampled staleness, and the action types a native run refuses (with the terminal command to use instead). |
 | [`graver-lookml-cleanup`](skills/graver-lookml-cleanup/SKILL.md) | The LookML audit loop: validate, read the blast radius, fix what a dashboard charts, then prove it with a diff against the previous run — plus the honesty rules, because only what is in git is visible and a skipped check is not a passed one. |
+| [`graver-looker-view-reconcile`](skills/graver-looker-view-reconcile/SKILL.md) | One view against its source: validate every field by running its SQL as a dry run — including the ones the project-wide check skips, Liquid-templated SQL branch by branch and `${other_view.field}` through the explore that joins it — then decide restore-or-remove per column, because "invalid" says the reference is wrong, not which end of it. |
 
 ## Install
 
