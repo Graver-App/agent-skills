@@ -28,7 +28,28 @@ release check the skills against it in the same pass:
    `MERGE` with `onSchemaChange: IGNORE` became supported, so "incrementals need the
    terminal" became wrong).
 4. Keep the frontmatter `description` stable unless the trigger surface genuinely changed
-   — it is what agents match on.
+   — it is what agents match on. If it did change, re-run the trigger gate below.
+5. **Bump `version` in `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json`
+   whenever a `SKILL.md` changes.** `npx skills add` re-fetches, but a Claude Code plugin
+   installed from the marketplace will not take an update without a version bump — the
+   installed copy goes stale silently, which is the whole failure mode this file exists to
+   prevent. Keep the two manifests' versions identical.
+
+## Two install paths, and which is which
+
+- `npx skills add Graver-App/agent-skills` — the spec-compliant path, and the reason the
+  layout is `skills/<name>/SKILL.md` at the repo root. It works for Codex CLI, Cursor and
+  anything else that reads the Agent Skills spec. **This is the primary path**; it is what
+  makes these skills a public contract rather than a Claude Code accessory.
+- `claude plugin marketplace add Graver-App/agent-skills` then
+  `claude plugin install graver-skills@graver` — the Claude Code path, from the manifests
+  in `.claude-plugin/`. Those manifests exist mainly so `claude plugin eval` can load the
+  skills and run a no-plugin baseline arm; the install path is a side benefit.
+
+Do not reorganise the repo into several plugins to make the marketplace tidier. It would
+move the skills out of root `skills/` and break the first path, to gain nothing: three
+skills with one audience and one release cadence do not need separate plugins, and each
+extra plugin adds its own version to bump.
 
 ## Test before merging (mandatory for a skill change)
 
