@@ -105,7 +105,7 @@ not substitute a guess.
 substituted** — the verdict is only as good as the substitution, and your reader
 needs to see it:
 
-| Construct | Substitute | Why
+| Construct | Substitute | Why |
 |---|---|---|
 | `{% parameter p %}` | a literal of `p`'s declared `type` | a type mismatch here fails the query for a reason that has nothing to do with the column |
 | `{% condition f %} expr {% endcondition %}` | `expr IS NOT NULL` | stays boolean whatever `expr`'s type is |
