@@ -162,9 +162,19 @@ harness is wrong — fix the substitution and run it again**:
 | `No matching signature for operator ...` | Your `{% parameter %}` literal was the wrong type |
 | `Syntax error: Unexpected "%"` | Liquid reached BigQuery — a construct you did not expand |
 | `Table ... was not found` | The table, not the column — or an identity that cannot see it |
+| `Multi-level aggregation requires the enclosing aggregate function ...` | **Nothing is wrong with the field.** A measure whose `sql:` already aggregates got wrapped in another aggregate. |
 
 Counting the second and third as findings is how a reconcile turns into a round of
 deletions nobody asked for.
+
+The last row is the one that caught Graver itself out. A measure's `sql:` is the
+*argument* to its aggregation, so a harness has to wrap it — and must not wrap one
+that already aggregates. Looker's non-aggregate measure types carry their own
+aggregate: `number`, `string`, `yesno`, `date`, the untyped measure (which defaults
+to `string`), and `date_time`, which is not in Looker's documented list at all even
+though projects write it. Wrap those and you manufacture this error against a field
+that works in production. If you see it, check your own wrapper before you believe
+it.
 
 ## Then decide, per column — and do not default to delete
 

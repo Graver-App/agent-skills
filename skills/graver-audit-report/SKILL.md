@@ -181,7 +181,12 @@ One item per problem, not one per cause. Six parts, every time:
    `Name X not found inside Y` is the **only** message that proves a column is absent.
    `No matching signature for operator` means something else was wrong with the SQL;
    `Syntax error: Unexpected "%"` means Liquid was never expanded and the field was
-   never really checked. Do not file either as a missing column.
+   never really checked. Do not file either as a missing column. And
+   `Multi-level aggregation requires the enclosing aggregate function …` is not a
+   finding at all — it means a measure whose `sql:` already aggregates was wrapped in
+   another aggregate, so the error belongs to whatever built the probe. A field
+   carrying it may work perfectly in production; check the tooling before writing it
+   into a work order.
 5. **The fix** — and which kind it is, from `attribution`. "Run `vw_orders`" and
    "remove this dimension" are different items and must not share a bullet.
 6. **How to verify it moved.** Re-run and diff against this document
