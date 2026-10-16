@@ -1,35 +1,150 @@
 {
-  "comment": "Trigger set: does each skill's description reach the requests it was written for, and stay out of its siblings' territory? Run with run_triggers.py, which measures through the real plugin mechanism. Do NOT measure this with skill-creator's scripts/run_eval.py — see BASELINE.md.",
+  "comment": "Trigger set: does each skill's description reach the requests it was written for, and stay out of its siblings' territory? Run with run_triggers.py, which measures through the real plugin mechanism. Do NOT measure this with skill-creator's scripts/run_eval.py \u2014 see BASELINE.md.",
   "queries": [
-    {"skill": "graver-looker-view-reconcile", "should_trigger": true,  "query": "Remove all columns in this looker view that are invalid in the Data source."},
-    {"skill": "graver-looker-view-reconcile", "should_trigger": true,  "query": "Which dimensions in views/core/customer.view.lkml are actually broken?"},
-    {"skill": "graver-looker-view-reconcile", "should_trigger": true,  "query": "Check this LookML view against BigQuery and tell me which columns don't exist any more"},
-    {"skill": "graver-looker-view-reconcile", "should_trigger": true,  "query": "This view has a few Liquid dimensions. Are the columns they reference still in the warehouse?"},
-    {"skill": "graver-looker-view-reconcile", "should_trigger": true,  "query": "Clean up the dead columns in my zip_code view"},
-    {"skill": "graver-looker-view-reconcile", "should_trigger": false, "query": "Audit our whole Looker project and tell me which dashboards will break first"},
-    {"skill": "graver-looker-view-reconcile", "should_trigger": false, "query": "Run the dataform pipeline for the customer table and its dependents"},
-    {"skill": "graver-looker-view-reconcile", "should_trigger": false, "query": "What's the difference between a dimension and a measure in Looker?"},
-    {"skill": "graver-looker-view-reconcile", "should_trigger": false, "query": "Build me a new explore for the orders view from scratch"},
-
-    {"skill": "graver-lookml-cleanup", "should_trigger": true,  "query": "Audit our LookML project and tell me what's broken"},
-    {"skill": "graver-lookml-cleanup", "should_trigger": true,  "query": "Which of our Looker dashboards will break, and what should I fix first?"},
-    {"skill": "graver-lookml-cleanup", "should_trigger": true,  "query": "I want to clean up dead LookML - unused explores and views nothing reaches"},
-    {"skill": "graver-lookml-cleanup", "should_trigger": true,  "query": "Prove this LookML cleanup actually changed what I meant it to, versus last week's run"},
-    {"skill": "graver-lookml-cleanup", "should_trigger": true,  "query": "How many fields in our Looker project does BigQuery reject?"},
-    {"skill": "graver-lookml-cleanup", "should_trigger": false, "query": "Remove the invalid columns from this one view"},
-    {"skill": "graver-lookml-cleanup", "should_trigger": false, "query": "Deploy my dataform project to production"},
-    {"skill": "graver-lookml-cleanup", "should_trigger": false, "query": "Help me set up a new Looker database connection"},
-    {"skill": "graver-lookml-cleanup", "should_trigger": false, "query": "Build me a new LookML view and explore from scratch"},
-    {"skill": "graver-lookml-cleanup", "should_trigger": false, "query": "How do I embed a Looker dashboard in our customer portal?"},
-    {"skill": "graver-lookml-cleanup", "should_trigger": false, "query": "Write a BigQuery query that counts orders by month"},
-
-    {"skill": "graver-dataform-workbench", "should_trigger": true,  "query": "Validate my dataform changes without actually running them"},
-    {"skill": "graver-dataform-workbench", "should_trigger": true,  "query": "Run just this one table and its dependents in dataform"},
-    {"skill": "graver-dataform-workbench", "should_trigger": true,  "query": "Is this dataform table stale compared to its sources?"},
-    {"skill": "graver-dataform-workbench", "should_trigger": true,  "query": "Show me the compiled SQL for this sqlx file before I run it"},
-    {"skill": "graver-dataform-workbench", "should_trigger": false, "query": "Audit our LookML project for broken fields"},
-    {"skill": "graver-dataform-workbench", "should_trigger": false, "query": "Check this Looker view's columns against the warehouse"},
-    {"skill": "graver-dataform-workbench", "should_trigger": false, "query": "Run my sqlanvil project against Postgres"},
-    {"skill": "graver-dataform-workbench", "should_trigger": false, "query": "Deploy my Supabase migrations to production"}
+    {
+      "skill": "graver-looker-view-reconcile",
+      "should_trigger": true,
+      "query": "Remove all columns in this looker view that are invalid in the Data source."
+    },
+    {
+      "skill": "graver-looker-view-reconcile",
+      "should_trigger": true,
+      "query": "Which dimensions in views/core/customer.view.lkml are actually broken?"
+    },
+    {
+      "skill": "graver-looker-view-reconcile",
+      "should_trigger": true,
+      "query": "Check this LookML view against BigQuery and tell me which columns don't exist any more"
+    },
+    {
+      "skill": "graver-looker-view-reconcile",
+      "should_trigger": true,
+      "query": "This view has a few Liquid dimensions. Are the columns they reference still in the warehouse?"
+    },
+    {
+      "skill": "graver-looker-view-reconcile",
+      "should_trigger": true,
+      "query": "Clean up the dead columns in my zip_code view"
+    },
+    {
+      "skill": "graver-looker-view-reconcile",
+      "should_trigger": false,
+      "query": "Audit our whole Looker project and tell me which dashboards will break first"
+    },
+    {
+      "skill": "graver-looker-view-reconcile",
+      "should_trigger": false,
+      "query": "Run the dataform pipeline for the customer table and its dependents"
+    },
+    {
+      "skill": "graver-looker-view-reconcile",
+      "should_trigger": false,
+      "query": "What's the difference between a dimension and a measure in Looker?"
+    },
+    {
+      "skill": "graver-looker-view-reconcile",
+      "should_trigger": false,
+      "query": "Build me a new explore for the orders view from scratch"
+    },
+    {
+      "skill": "graver-lookml-cleanup",
+      "should_trigger": true,
+      "query": "Audit our LookML project and tell me what's broken"
+    },
+    {
+      "skill": "graver-lookml-cleanup",
+      "should_trigger": true,
+      "query": "Which of our Looker dashboards will break, and what should I fix first?"
+    },
+    {
+      "skill": "graver-lookml-cleanup",
+      "should_trigger": true,
+      "query": "I want to clean up dead LookML - unused explores and views nothing reaches"
+    },
+    {
+      "skill": "graver-lookml-cleanup",
+      "should_trigger": true,
+      "query": "Prove this LookML cleanup actually changed what I meant it to, versus last week's run"
+    },
+    {
+      "skill": "graver-lookml-cleanup",
+      "should_trigger": true,
+      "query": "How many fields in our Looker project does BigQuery reject?"
+    },
+    {
+      "skill": "graver-lookml-cleanup",
+      "should_trigger": false,
+      "query": "Remove the invalid columns from this one view"
+    },
+    {
+      "skill": "graver-lookml-cleanup",
+      "should_trigger": false,
+      "query": "Deploy my dataform project to production"
+    },
+    {
+      "skill": "graver-lookml-cleanup",
+      "should_trigger": false,
+      "query": "Help me set up a new Looker database connection"
+    },
+    {
+      "skill": "graver-lookml-cleanup",
+      "should_trigger": false,
+      "query": "Build me a new LookML view and explore from scratch"
+    },
+    {
+      "skill": "graver-lookml-cleanup",
+      "should_trigger": false,
+      "query": "How do I embed a Looker dashboard in our customer portal?"
+    },
+    {
+      "skill": "graver-lookml-cleanup",
+      "should_trigger": false,
+      "query": "Write a BigQuery query that counts orders by month"
+    },
+    {
+      "skill": "graver-dataform-workbench",
+      "should_trigger": true,
+      "query": "Validate my dataform changes without actually running them"
+    },
+    {
+      "skill": "graver-dataform-workbench",
+      "should_trigger": true,
+      "query": "Run just this one table and its dependents in dataform"
+    },
+    {
+      "skill": "graver-dataform-workbench",
+      "should_trigger": true,
+      "query": "Is this dataform table stale compared to its sources?"
+    },
+    {
+      "skill": "graver-dataform-workbench",
+      "should_trigger": true,
+      "query": "Show me the compiled SQL for this sqlx file before I run it"
+    },
+    {
+      "skill": "graver-dataform-workbench",
+      "should_trigger": false,
+      "query": "Audit our LookML project for broken fields"
+    },
+    {
+      "skill": "graver-dataform-workbench",
+      "should_trigger": false,
+      "query": "Check this Looker view's columns against the warehouse"
+    },
+    {
+      "skill": "graver-dataform-workbench",
+      "should_trigger": false,
+      "query": "Run my sqlanvil project against Postgres"
+    },
+    {
+      "skill": "graver-dataform-workbench",
+      "should_trigger": false,
+      "query": "Deploy my Supabase migrations to production"
+    },
+    {
+      "skill": "graver-dataform-workbench",
+      "should_trigger": true,
+      "query": "We just backfilled column descriptions - are any of our columns: blocks claiming columns the query doesn't produce?"
+    }
   ]
 }

@@ -41,9 +41,45 @@ you write to. Do not run anything before you have read it.
 | Look at data | `dataform_preview(action, limit)` | `SELECT * LIMIT n`, default 20, max 200 |
 | What needs a run | `dataform_staleness` | not built, or built before the code changed |
 | Run | `dataform_run(action, include_stale_deps)` | one object; see the refusals below |
+| Audit the docs | `dataform_declaration_drift` | every `columns:` block against its query; **expensive, opt-in** |
 
 `action` is always the object's **bare name** (`top_words`), not a path and not a
 fully-qualified target.
+
+## Are the `columns:` blocks true?
+
+`dataform_declaration_drift` checks every `columns:` block in the project against
+what its query actually produces. The moment to run it is right after a
+documentation backfill, which is the moment a block most often starts claiming a
+column the query stopped selecting.
+
+It reports two outcomes and they are not the same kind of thing:
+
+- **Phantom** — declared, not produced. **A defect.** Anything reading the block
+  believes it. A phantom column is how a column dropped from a query a year ago
+  goes on being advertised, and how a tool that trusts the block issues an order
+  that cannot work.
+- **Undeclared** — produced, not documented. **Not a defect.** `columns:`
+  describes; it does not promise completeness. Report it as context — it is what
+  makes a declaration weak evidence — not as work.
+
+**It is expensive and that is why it is a separate tool.** One BigQuery dry run
+per object that declares columns: free in bytes, nothing scanned, nothing
+billed, and minutes of wall clock on a large project. It is never part of
+`dataform_validate`, and you should not call it speculatively.
+
+**Read the coverage before quoting the result.** `complete` is false when any
+object that claims columns went unchecked, and `notChecked` names the probes
+that failed. "No phantoms" and "no phantoms among the objects we got to" are
+different answers, and only one of them is in `findings`. Declarations are out
+of scope and counted in `declarationsNotInScope`: a declaration has no query of
+its own to dry-run, so its block describes a table the project reads rather
+than builds.
+
+A phantom is a statement about **this commit's** compiled query, and the tool
+infers no intent. A declared column that is gone may be one somebody wants back
+— the fix is either the documentation or the query, and that is the human's
+call, not yours.
 
 ## Why these instead of `dataform` on the command line
 
