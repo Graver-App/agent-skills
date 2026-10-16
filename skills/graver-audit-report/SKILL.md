@@ -108,12 +108,26 @@ entry carries both the problem and its attribution:
 | `unattributed` | the cross-check reached no verdict for this field | **not** a finding against the LookML — see below |
 | `notCrossChecked` | no Dataform project was supplied to the run | the run was incomplete; offer to re-run with one |
 
-`unattributed` is the one to get right. On a real project it is routinely the
-majority — 189 of 228 in one run — and it means Graver could not establish column
-provenance for that table, not that the field is wrong. Grouping those under
-"fields to delete" would be the worst thing this report could do. Give them their
-own section, named for what it is: *the warehouse rejected these and nothing
-established why*.
+`unattributed` is the one to get right, in both directions. On a real project it is
+routinely the majority — 189 of 228 in one run — and it means Graver could not
+establish column provenance for that table, not that the field is wrong. Grouping
+those under "fields to delete" would be the worst thing this report could do.
+
+But a whole section called "no verdict, not actionable" is the second worst, and it
+is the easier mistake to make. **Group by declaring file first, attribution second.**
+In that same run, one base view accounted for 119 findings — 32 `staleReference` and
+87 `unattributed` — and a report that split by attribution reported it as 32 and
+filed the other 87 under "not findings". Same file, same line numbers, same defect,
+73% of it hidden. A declaring site that spans attribution buckets is **one item**,
+and the attributions are facts about how much of it Graver could explain, not a
+partition of the work.
+
+So: cluster on `file` (and `declaringView` for inherited fields), count the cluster,
+and only then say what the attributions in it mean. A cluster that is entirely
+`unattributed` and spread across one view usually resolves to a single upstream
+cause too — 72 fields reading *no column provenance for X* is one object to fix, not
+72 items. Report it that way, and the count becomes an argument for fixing it rather
+than a reason to skip the section.
 
 ### Where the declared and the real diverge
 
@@ -193,9 +207,11 @@ One item per problem, not one per cause. Six parts, every time:
    (`graver-lookml --diff <this file>`), and name the id that should disappear.
    "Re-run and look" is not a verification step.
 
-Order items by consequence, not by file: fields on an indexed dashboard, then fields
-on any dashboard, then phantom declarations, then everything else. Put `unattributed`
-and skipped fields in their own sections, below, clearly not queued for deletion.
+Order items by consequence: fields on an indexed dashboard, then fields on any
+dashboard, then phantom declarations, then the largest declaring-site clusters, then
+everything else. Skipped fields go in their own section, below, clearly not queued
+for deletion — and so do the `unattributed` findings that are left *after* clustering
+by declaring site, which is usually far fewer than the raw count suggests.
 
 Attach each caveat to the items it undermines, inline. An item resting on a skipped
 check, a stale replay, or an identity that was never established is not actionable,
