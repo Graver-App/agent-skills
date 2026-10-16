@@ -51,6 +51,13 @@ grader-authoring traps worth reading before writing one (vacuous `not_contains`
 graders, JavaScript regex flags, column-0 frontmatter, and how a wrong `input_match`
 reads exactly like a skill that never fired).
 
+Anthropic's official `skill-creator` plugin
+(`/plugin install skill-creator@claude-plugins-official`) covers the authoring side of
+this loop and adds something this suite does not have: `scripts/improve_description.py`
+and `scripts/run_loop.py` optimise a skill's `description` for **triggering** accuracy,
+with a train/test split. Worth reaching for when a skill is not firing on the requests
+it was written for — `trigger-user-phrasing` detects that, but does not fix it.
+
 Evals cost money and need model access, so they are a local gate rather than CI. CI
 lints frontmatter only.
 

@@ -4,8 +4,7 @@ allowed_tools: [Read, Glob, Grep, Skill]
 runs: 1
 ---
 
-I re-ran Graver's LookML validation (`looker_validate` with `diff_from`) against last week's
-saved findings document. The diff says:
+I re-ran the LookML validation against last week's saved findings document. The diff says:
 
 ```
 2 no longer reported · 330 unchanged
