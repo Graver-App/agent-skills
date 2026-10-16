@@ -59,9 +59,15 @@ It reports two outcomes and they are not the same kind of thing:
   believes it. A phantom column is how a column dropped from a query a year ago
   goes on being advertised, and how a tool that trusts the block issues an order
   that cannot work.
-- **Undeclared** — produced, not documented. **Not a defect.** `columns:`
-  describes; it does not promise completeness. Report it as context — it is what
-  makes a declaration weak evidence — not as work.
+- **Undeclared** — produced, not documented. **Not a defect**, and not nothing.
+  `columns:` describes; it does not promise completeness, so do not file 2000
+  undocumented columns as work. But an undeclared column means a query gained a
+  column and its documentation did not follow, and the commit that moved the
+  query is worth a look. On a real project this signal led to a report view
+  whose `columns:` block had been untrue for ten months — and reading that file
+  turned up an inner join that was returning 4 rows where 2169 belonged. The
+  undocumented columns were not the defect; they were the reason anybody opened
+  the file.
 
 **It is expensive and that is why it is a separate tool.** One BigQuery dry run
 per object that declares columns: free in bytes, nothing scanned, nothing
