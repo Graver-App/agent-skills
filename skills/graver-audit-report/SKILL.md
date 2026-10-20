@@ -79,10 +79,29 @@ is a document from a binary that did not report this. Say so.
 | `blastRadius.onNoDashboard` | failing fields nothing in the repository reaches |
 | `blastRadius.index.failingFieldsOnALinkedDashboard` | of those, the ones on a dashboard the project's own index page links |
 | `blastRadius.caveat` | why "on no dashboard" is not "unused" — see the refusals below |
+| `blastRadius.byKind` | what the total is made of: `rejected`, `unresolvedReference`, `notJoined` |
 
 A real project can report 240 failing fields of which **one** is on a charted
 dashboard. A report that leads with 240 has buried its own answer. Lead with the
 split, and order the checklist by it.
+
+#### `failingFields` is a union of three checks — use `byKind`
+
+`blastRadius.failingFields` counts distinct `view.field` across BigQuery
+rejections, unresolved references **and** fields whose explore lacks a join it
+needs. `byKind` breaks that down disjointly — first match wins, so the values
+sum to the total.
+
+Two consequences, and both have produced a wrong report:
+
+- **`triage.failingFieldsByView` lists the rejections only.** A project that has
+  fixed every rejection leaves it empty while the headline is still non-zero.
+  The rest are in `triage.notJoinedFieldsByView` (below). Reconcile the headline
+  as `failingFieldsByView` + `notJoinedFieldsByView`, never from one of them.
+- **`warehouse.typeMismatches` is in neither.** It is reported separately and
+  counted in no failing-field total. Adding the warehouse categories together to
+  reach `failingFields` gives the right answer on some projects by coincidence
+  and the wrong one on others. Don't; read `byKind`.
 
 ### What to fix, and whose fault it is
 
@@ -110,6 +129,31 @@ entry carries both the problem and its attribution:
 | `outsideProject` | the reference leaves the project | not a defect to fix here |
 | `unattributed` | the cross-check reached no verdict for this field | **not** a finding against the LookML — see below |
 | `notCrossChecked` | no Dataform project was supplied to the run | the run was incomplete; offer to re-run with one |
+
+### Fields whose explore doesn't join a view they read
+
+`triage.notJoinedFieldsByView[]` has the same `{view, count, fields[]}` shape and
+is the other half of `blastRadius.failingFields`:
+
+```json
+{ "field": "is_priority", "file": "views/orders_refinement.view.lkml", "line": 16,
+  "referencedViews": ["segment", "account"],
+  "explores": ["sales.orders", "sales.returns"], "exploresMissingTheJoin": 2,
+  "dashboards": [], "onIndexedDashboard": false }
+```
+
+**One entry per field, with the explores rolled up.** The same field fails in
+every explore that lacks the join, so `missingJoins` at the top level holds many
+more records describing the same handful of fields — a hundred records can be a
+dozen fields. Never present the record count as the number of fixes.
+
+These are **decisions, not repairs**: each needs a join added to the explore or
+the field rewritten, and which one is a modelling question for whoever owns the
+model. Do not list them beside stale references as though both were typing.
+
+`dashboards` here is scoped to the explores that lack the join. A dashboard
+reading the same field through an explore that *does* join it is unaffected, so
+this field can be latent while the field is charted elsewhere.
 
 `unattributed` is the one to get right, in both directions. On a real project it is
 routinely the majority — 189 of 228 in one run — and it means Graver could not

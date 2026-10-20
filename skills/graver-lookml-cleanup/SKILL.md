@@ -80,13 +80,19 @@ unvalidatable count usually means this is wrong, not that the project is broken.
    plus `shouldReproduce` and `linkedFromIndex`. Reachability alone is close to
    useless: on a real project two dashboards charted a failing field while a hundred
    more could reach one.
-3. **`triage.failingFieldsByView`** — **one entry per cause, not per instance.** A
+3. **`blastRadius.byKind`** — `failingFields` is a union of BigQuery rejections,
+   unresolved references and fields whose explore lacks a join. `byKind` splits it
+   disjointly. `failingFieldsByView` lists the **rejections only**, so a project
+   that has fixed them all leaves it empty under a non-zero headline; the rest are
+   in `triage.notJoinedFieldsByView`, one entry per field with the explores rolled
+   up. `warehouse.typeMismatches` is counted in neither.
+4. **`triage.failingFieldsByView`** — **one entry per cause, not per instance.** A
    view whose table was replaced shows up as one group with a count, not as 72
    separate findings. Make the two decisions the group represents; do not make 72
    edits.
-4. **`warehouse.rejected`** — per-finding `dashboards`, `inherited`, `declaringView`,
+5. **`warehouse.rejected`** — per-finding `dashboards`, `inherited`, `declaringView`,
    `file`, `line`, and BigQuery's verbatim `message`.
-5. **`triage.brokenViewsNoDashboardReaches`** and **`triage.unusedExplores`** — the
+6. **`triage.brokenViewsNoDashboardReaches`** and **`triage.unusedExplores`** — the
    latent debt. Read the caveat below before touching any of it.
 
 `inherited` + `declaringView` are how you avoid the classic mistake: a broken field
