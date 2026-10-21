@@ -85,7 +85,8 @@ unvalidatable count usually means this is wrong, not that the project is broken.
    disjointly. `failingFieldsByView` lists the **rejections only**, so a project
    that has fixed them all leaves it empty under a non-zero headline; the rest are
    in `triage.notJoinedFieldsByView`, one entry per field with the explores rolled
-   up. `warehouse.typeMismatches` is counted in neither.
+   up. `warehouse.typeMismatches` is counted in neither — nor in the diff's
+   `counts.findings`, which carries them separately as `counts.typeMismatches`.
 4. **`triage.failingFieldsByView`** — **one entry per cause, not per instance.** A
    view whose table was replaced shows up as one group with a count, not as 72
    separate findings. Make the two decisions the group represents; do not make 72
@@ -177,8 +178,21 @@ reports `gone`, `new`, `changed`, `unchanged`, each one named, with `counts.find
 before and after. `changed` is the category that matters most while you work: same
 field, different message — you fixed one column and it now fails on the next.
 
+**`counts.findings` counts findings the way the report's own headline does**, so the
+two can never disagree. Declared-type mismatches are tracked beside it in
+`counts.typeMismatches`: they are reported, they show up in `new` if one appears, and
+they are not findings. Before 0.5.4 they were added to `counts.findings`, so a clean
+project could read "0 findings" in its headline and "7 finding(s) still open" in its
+diff.
+
 Each document is stamped with the `corpus` it ran against (name, commit, dirty), so a
-diff can say which commits it spans and warns when it cannot.
+diff can say which commits it spans and warns when it cannot. From 0.5.4 it also
+carries `graver` — which build produced it. **Check it before attributing a moved
+count to the project:** a release can change what the audit reports, and two
+documents made by different builds are not directly comparable. On a replay,
+`replay.recordedBy` and `replay.replayedBy` say the same thing for the recording and
+the tool reading it, and a recording made before 0.5.4 reports `null` rather than
+implying it was made by the build in front of you.
 
 ## Don't
 

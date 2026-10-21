@@ -99,9 +99,10 @@ Two consequences, and both have produced a wrong report:
   The rest are in `triage.notJoinedFieldsByView` (below). Reconcile the headline
   as `failingFieldsByView` + `notJoinedFieldsByView`, never from one of them.
 - **`warehouse.typeMismatches` is in neither.** It is reported separately and
-  counted in no failing-field total. Adding the warehouse categories together to
-  reach `failingFields` gives the right answer on some projects by coincidence
-  and the wrong one on others. Don't; read `byKind`.
+  counted in no failing-field total, including the diff's `counts.findings`,
+  which carries them as `counts.typeMismatches` instead. Adding the warehouse
+  categories together to reach `failingFields` gives the right answer on some
+  projects by coincidence and the wrong one on others. Don't; read `byKind`.
 
 ### What to fix, and whose fault it is
 
