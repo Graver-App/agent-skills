@@ -1,6 +1,6 @@
 ---
 name: graver-lookml-cleanup
-description: Use when auditing or cleaning up a LookML project — broken fields, views and explores nothing reaches, dashboards that will fail — with Graver (graver.dev), through either the `looker_validate` MCP tool or the `graver-lookml` CLI. Covers the order to run the loop in (validate, triage, fix what is charted, diff, re-validate) and the rules that keep a cleanup honest: only git is visible so "on no dashboard" means defer rather than delete, "no longer reported" is not "fixed", and a check that was skipped is not a check that passed.
+description: Use when auditing or cleaning up a LookML project — broken fields, views and explores nothing reaches, dashboards that will fail — with Graver (graver.dev), through either the `looker_validate` MCP tool or the `graver-lookml` CLI. Covers the order to run the loop in (validate, triage, fix what is charted, diff, re-validate) and the rules that keep a cleanup honest: only git is visible so "on no dashboard" means defer rather than delete, "no longer reported" is not "fixed", and a check that was skipped is not a check that passed. Also covers asking the instance itself, when a `looker.ini` is named, whether production is serving the commit being validated.
 license: Apache-2.0
 metadata:
   source: https://graver.dev
@@ -16,9 +16,16 @@ when a query happens to use a broken field. It parses every file, resolves inclu
 references, fields referencing a view their explore does not join, and (given a
 BigQuery project) every field's SQL dry-run against the warehouse.
 
-**It calls no Looker API and needs no Looker credentials.** The project is a folder
-with `manifest.lkml` in it. Warehouse checks use local application-default
-credentials and are dry runs: nothing is scanned, nothing is billed, no rows are read.
+**It calls no Looker API unless you name one.** The project is a folder with
+`manifest.lkml` in it, and with no `looker_ini` argument no instance is contacted and
+no credentials file is ever searched for. Warehouse checks use local
+application-default credentials and are dry runs: nothing is scanned, nothing is
+billed, no rows are read.
+
+Two questions a repository cannot answer — **whether production is serving the commit
+you are validating**, and which page Looker's homepage points at — are answered only
+by the instance. Naming a `looker.ini` asks both, in 3 read-only calls. See
+"Asking the instance" below before you do: that quota is usually small and shared.
 
 Two surfaces, same engine:
 
@@ -62,6 +69,10 @@ at. That skill validates each field itself, branch by branch.
 | `triage` | `--triage` | the work order: grouped by cause, dashboards to open, what nothing reaches |
 | `looker_url` | `--looker-url` | makes the work order's dashboard links clickable; **implies triage** |
 | `diff_from` | `--diff` | compare against a saved earlier run |
+| `looker_ini` | `--looker-ini` | a `looker.ini` naming a Looker instance, which unlocks the two questions below. **Opt-in; never discovered.** A `.json` here is a recorded visit (`--record-looker`) replayed for no calls at all |
+| `looker_section` | `--looker-section` | which section of that file to read (default `Looker`) |
+| `check_deployed` | `--check-deployed` | compare what production serves with this checkout. **On by default once `looker_ini` is set**; pass false to skip |
+| `index_from_looker` | `--index-from-looker` | resolve the index from the instance's own `landing_page` instead of naming it. On by default once `looker_ini` is set. An `index` you pass always wins |
 | `format` | *(markdown is the default; `--json` for data)* | `json` is the MCP default |
 
 The CLI also takes `--connection-default <project.dataset>` (what Looker's connection
@@ -98,6 +109,42 @@ unvalidatable count usually means this is wrong, not that the project is broken.
 
 `inherited` + `declaringView` are how you avoid the classic mistake: a broken field
 in a mixin shows up in every view that extends it. Fix the declaring view once.
+
+## Asking the instance
+
+Everything above reads the checkout. That is the feature — it means a run says what
+*this* code does, before anyone deploys it — and it is also the limit: without the
+instance, a report cannot say whether anyone is looking at the code it describes, and
+says so in `corpus.deploymentCaveat`.
+
+`looker_ini` resolves that caveat. **Decide to spend it.** A `looker.ini` in the wild
+is live production more often than not, usually on a licence with about 1,000 API
+calls a month shared by every tool and person using it, so:
+
+- **Ask the user before naming a credentials file they did not name**, the same way
+  you would before running anything against production. Graver will not go looking for
+  one; neither should you.
+- **Every run reports `lookerInstance`** — `consulted`, `contactedInstance`,
+  `askedIndex`, `askedDeployment`, `callsSpent`, `notes`, `warnings`. It is always
+  present: `{"consulted": false}` means nothing was asked, which is different from a
+  build that does not report it. Quote `callsSpent` when you tell the user what a run
+  cost.
+- **A recording spends nothing.** `graver-lookml --record-looker <file>` on the machine
+  that holds the credentials captures one visit; passing that `.json` as `looker_ini`
+  replays it anywhere, with `contactedInstance: false`. Prefer it for repeat runs.
+
+Then read **`corpus.deploymentVerdict`**, and change what you do:
+
+| Verdict | What it means for the cleanup |
+|---|---|
+| `deployed` | production serves this commit; the findings describe what people see |
+| `behind` | this commit is not deployed. The findings describe code Looker is not serving — fixing them changes nothing anyone can see yet. With `rollbackSuspected: true` a deploy ran *after* this commit and still landed behind it, the signature of a reused deploy message: say so, because the report and production disagree for a reason nobody has noticed |
+| `ahead` | the checkout is behind production. **Pull before you edit**; the findings may be stale |
+| `diverged` | nothing here describes production. Stop and say so |
+| `unknown` | the question was asked and not settled. `corpus.deploymentReason` says why — commonly that the ref the instance named is not in this clone (`git fetch --tags`). **Never read as `deployed`** |
+
+A verdict never changes which fields are broken. It changes whether "fixed" means
+anything yet, which is the sentence a user acts on.
 
 ## The rules that keep it honest
 
@@ -217,3 +264,6 @@ implying it was made by the build in front of you.
 - **Don't treat a group as a list of edits.** `failingFieldsByView` is causes.
 - **Don't re-run without `diff_from`** once you have a baseline. An un-diffed re-run
   makes the human compare two reports by eye, which is the job this replaces.
+- **Don't reach for a `looker.ini` the user did not name.** It is production on a
+  shared quota. And don't report `unknown` as deployed — it is the answer that says
+  the question is still open.
