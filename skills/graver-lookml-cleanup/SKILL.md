@@ -158,6 +158,20 @@ every tile over that group fails at run time with `No matching signature for ope
 why it validates: the generated *filter* is what breaks, and no static check generates
 filters. Confirm a time column's real type before writing the group.
 
+**And the mismatch that breaks nothing is a decision, not a defect.** BigQuery
+coerces between DATE and DATETIME, so a `dimension_group` that declares the wrong one
+of those two still runs. `datatype:` also decides which timeframes Looker offers and
+how it renders them, so a declaration that disagrees with the column can be the only
+way to get the filter behaviour a dashboard needs — on one production project, four of
+the five DATE columns declared `datetime` already carried `convert_tz: no`, which is
+the evidence the handling was considered. From 0.5.5 the report says so: it prescribes
+`datatype:` only where the mismatch breaks at run time, and otherwise states the
+disagreement and asks you to confirm the intent. **Never write a non-breaking
+mismatch up as a fix.** Read the field's `convert_tz:` while you are there, because
+that is where the risk lives: a timezone-less column Looker converts anyway is a date
+that moves by a day, so changing `datatype:` without pairing it with `convert_tz: no`
+can reintroduce a shift someone already fixed.
+
 **Filter syntax is type-specific and unchecked.** A not-null filter on a string
 dimension is `"-NULL"`; a `type: number` dimension rejects that and takes `"NULL"` /
 `"NOT NULL"`. Validation evaluates no filter value, so the wrong one ships.
@@ -199,6 +213,7 @@ implying it was made by the build in front of you.
 - **Don't delete on "unused".** See the git caveat. Defer, and tell the user what you
   deferred.
 - **Don't quote the total as the headline.** Quote the split.
+- **Don't prescribe a `datatype:` change that breaks nothing.** Report it and ask.
 - **Don't treat a group as a list of edits.** `failingFieldsByView` is causes.
 - **Don't re-run without `diff_from`** once you have a baseline. An un-diffed re-run
   makes the human compare two reports by eye, which is the job this replaces.
